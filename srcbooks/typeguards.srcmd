@@ -1,0 +1,61 @@
+<!-- srcbook:{"language":"typescript"} -->
+
+# TypeGuards
+
+###### package.json
+
+```json
+{
+  "type": "module",
+  "dependencies": {
+    "tsx": "latest",
+    "typescript": "latest",
+    "@types/node": "latest"
+  }
+}
+```
+
+## User Defined Type Guards
+TypeScript allows you to define custom type guards to help narrow down types.Type guards are expressions which perform **runtime** checks to ensure that a variable is of a specific type. Built-in type guards include `typeof` and `instanceof`. However, for complex types, you can create user-defined type guards.
+
+###### without-predicates.ts
+
+```typescript
+type Circle = { kind: 'circle'; radius: number };
+type Rect = { kind: 'rect'; width: number; height: number };
+type Shape = Circle | Rect;
+
+function isCircle(shape: Shape) {
+  return shape.kind === 'circle';
+}
+
+function isRect(shape: Shape) {
+  return shape.kind === 'rect';
+}
+
+const myShapes: Shape[] = getShapes();
+
+// error because typescript doesn't know that filtering narrows typing
+const circles: Circle[] = myShapes.filter(isCircle);
+
+// you may be inclined to add an assertion:
+// const circles = myShapes.filter(isCircle) as Circle[];
+```
+
+A more elegant solution is to change `isCircle` and `isRect` to return type predicates instead. This helps TypeScript further narrow down types after the filter call:
+
+###### with-predicates.ts
+
+```typescript
+function isCircle(shape: Shape): shape is Circle {
+    return shape.kind === 'circle';
+}
+
+function isRect(shape: Shape): shape is Rect {
+    return shape.kind === 'rect';
+}
+
+...
+// now you get Circle[] type inferred correctly
+const circles = myShapes.filter(isCircle);
+```

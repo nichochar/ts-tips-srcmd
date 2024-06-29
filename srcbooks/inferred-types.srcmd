@@ -1,0 +1,40 @@
+<!-- srcbook:{"language":"typescript"} -->
+
+# Inferred types
+
+###### package.json
+
+```json
+{
+  "type": "module",
+  "dependencies": {
+    "tsx": "latest",
+    "typescript": "latest",
+    "@types/node": "latest"
+  }
+}
+```
+
+## Inferred types mastery
+
+TypeScript is very good at inferring types, but uses sensible "default" behavior. Typically this behavior is desired, but sometimes you want to be more specific.
+
+For instance, when you declare `const foo = 'thing'`, TypeScript infers that the type of foo is `string` rather than `'thing'`. This is a good default, but sometimes you want constants to _actually_ be constants.
+
+You can leverage `as const` do narrow the type to the strictest match, like shown below:
+
+###### const.ts
+
+```typescript
+let foo = { name: 'foo' };          // typed: { name: string }, the default is wide
+let Bar = { name: 'bar' } as const; // typed: { name: 'bar' }
+
+let a = [1, 2];          // typed: number[], the default is wide
+let b = [1, 2] as const; // typed: [1, 2]
+
+// typed { kind: 'circle; radius: number }
+let circle = { kind: 'circle' as const, radius: 1.0 };
+
+// the following won't work if circle wasn't initialized with the const keyword
+let shape: { kind: 'circle' | 'rect' } = circle;
+```

@@ -1,0 +1,59 @@
+<!-- srcbook:{"language":"typescript"} -->
+
+# Disjoint types
+
+###### package.json
+
+```json
+{
+  "type": "module",
+  "dependencies": {
+    "tsx": "latest",
+    "typescript": "latest",
+    "@types/node": "latest"
+  }
+}
+```
+
+## Prefer unions of types over types of unions
+
+When you create a type who's properties are union types, you should ask yourself whether the type would make more sense as a union of more precise types.
+
+###### union-types.ts
+
+```typescript
+type NaiveResponse = {
+  status: 'success' | 'error';
+  errorMessage?: string;
+  responseData?: string;
+}
+
+// The fact that `status` is a union is a smell. You should have more precise types
+type SuccessResponse = {
+  status: 'success';
+  responseData: string;
+}
+type ErrorResponse = {
+  status: 'error';
+  errorMessage: string;
+}
+
+export type BetterResponse = SuccessResponse | ErrorResponse;
+```
+
+In addition to getting more precise types, the example above shows a second trick: use one of the fields as a **"tag"**, here `'status'`. This allows you to switch in code branches on that tag and TypeScript will infer the types correctly.
+
+###### inferred-type.ts
+
+```typescript
+import type { BetterResponse } from './union-types.ts';
+
+const handleResponse = (response: BetterResponse) => {
+  if (response.status === 'success') {
+    // TypeScript infers that we have a SuccessResponse
+    return response.responseData;
+  } else {
+    throw new Error(response.errorMessage)
+  }
+}
+```

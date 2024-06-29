@@ -1,2 +1,3 @@
 # ts-tips-srcmd
-TypeScript tips, in Srcbook format
+
+TypeScript tips, in Srcbook format.
